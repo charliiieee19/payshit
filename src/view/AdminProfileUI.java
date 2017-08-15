@@ -36,33 +36,18 @@ public class AdminProfileUI extends JFrame {
 	private JTextField empNameTF;
 	private JTextField idTF;
 	private JLabel background;
-	private String[] salaryList = { "Daily", "Hours", "Month" };
-	private JTextField rateTF;
-	private JTextField nofdaysTF;
-	private JTextField otTF;
-	private JTextField holidayTF;
-	private JTextField legalHolTF;
-	private JTextField sssTF;
-	private JTextField phTF;
-	private JTextField withHoldTF;
-	private JTextField pagibigTF;
-	private JTextField pagibigloanTF;
-	private JTextField sssloanTF;
-	private JTextField deducTF;
-	private JTextField deduc2TF;
-	private JTextField totaldeducTF;
-	private JTextField npayTF;
-	private JTextField totalOTTF;
-	private JTextField allowTF;
-	private JTextField otherTF;
-	private JTextField grossTF;
-	private JTextField sss2TF;
-	private JTextField ph2TF;
-	private JTextField pagibig2TF;
 	private JButton btnSave, btnCancel, btnEdit;
 	private Connection con;
 	private Statement st;
 	private ResultSet rs;
+	private JTextField bpTF;
+	private JTextField allowTF;
+	private JTextField otTF;
+	private JTextField sssTF;
+	private JTextField phTF;
+	private JTextField hdmfTF;
+	private JTextField npTF;
+	private JTextField taxTF;
 
 	public AdminProfileUI() throws ClassNotFoundException, SQLException {
 		setTitle("Edit Employee");
@@ -93,6 +78,42 @@ public class AdminProfileUI extends JFrame {
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				closeTF();
+				String dbURL = "jdbc:db2://localhost:50000/payroll";
+				String username = "Charlie";
+				String password = "1231234";
+				String id = idTF.getText();
+				String bp = bpTF.getText();
+				String alw = allowTF.getText();
+				String ot = otTF.getText();
+				String sss = sssTF.getText();
+				String ph = phTF.getText();
+				String hdmf = hdmfTF.getText();
+				String tax = taxTF.getText();
+
+				try (Connection conn = DriverManager.getConnection(dbURL, username, password)) {
+
+					String sql = "UPDATE employees SET basicpay=?, allowance=?, overtime=?, sss=?, phealth=?, hdmf=?, tax=? where id =?";
+
+					PreparedStatement statement = conn.prepareStatement(sql);
+					statement.setString(1, bp);
+					statement.setString(2, alw);
+					statement.setString(3, ot);
+					statement.setString(4, sss);
+					statement.setString(5, ph);
+					statement.setString(6, hdmf);
+					statement.setString(7, tax);
+					statement.setString(8, id);
+
+					int rowsUpdated = statement.executeUpdate();
+					if (rowsUpdated > 0) {
+						JOptionPane.showMessageDialog(null, "Record Saved...");
+					}
+					display();
+
+				} catch (SQLException | ClassNotFoundException ex) {
+					ex.printStackTrace();
+				}
+
 			}
 		});
 		btnSave.setEnabled(false);
@@ -140,294 +161,33 @@ public class AdminProfileUI extends JFrame {
 
 		empNameTF = new JTextField();
 		empNameTF.setEditable(false);
-		empNameTF.setBounds(92, 118, 136, 20);
+		empNameTF.setBounds(92, 118, 193, 20);
 		contentPane.add(empNameTF);
 		empNameTF.setColumns(10);
 
 		idTF = new JTextField();
 		idTF.setEditable(false);
-		idTF.setBounds(92, 146, 136, 20);
+		idTF.setBounds(92, 146, 193, 20);
 		contentPane.add(idTF);
 		idTF.setColumns(10);
-
-		JLabel lblSalaryMethod = new JLabel("Salary Method");
-		lblSalaryMethod.setBounds(276, 119, 95, 19);
-		contentPane.add(lblSalaryMethod);
-
-		JComboBox comboBox = new JComboBox(salaryList);
-		comboBox.setBounds(381, 118, 95, 20);
-		contentPane.add(comboBox);
-
-		JLabel lblRegularOvertime = new JLabel("Regular & Overtime pay:");
-		lblRegularOvertime.setFont(new Font("Dialog", Font.BOLD, 12));
-		lblRegularOvertime.setBounds(23, 194, 143, 19);
-		contentPane.add(lblRegularOvertime);
-
-		JLabel lblRate = new JLabel("Rate:");
-		lblRate.setBounds(23, 232, 46, 14);
-		contentPane.add(lblRate);
-
-		rateTF = new JTextField();
-		rateTF.setEditable(false);
-		rateTF.setBounds(142, 224, 86, 20);
-		contentPane.add(rateTF);
-		rateTF.setColumns(10);
-
-		JLabel lblNoOfDays = new JLabel("No. of Days:");
-		lblNoOfDays.setBounds(23, 257, 82, 19);
-		contentPane.add(lblNoOfDays);
-
-		nofdaysTF = new JTextField();
-		nofdaysTF.setEditable(false);
-		nofdaysTF.setBounds(142, 255, 86, 20);
-		contentPane.add(nofdaysTF);
-		nofdaysTF.setColumns(10);
-
-		JLabel lblRegularOt = new JLabel("Regular OT:");
-		lblRegularOt.setBounds(23, 287, 95, 19);
-		contentPane.add(lblRegularOt);
-
-		otTF = new JTextField();
-		otTF.setEditable(false);
-		otTF.setBounds(142, 286, 86, 20);
-		contentPane.add(otTF);
-		otTF.setColumns(10);
-
-		JLabel lblSpecialHoliday = new JLabel("Special Holiday");
-		lblSpecialHoliday.setBounds(23, 317, 82, 19);
-		contentPane.add(lblSpecialHoliday);
-
-		holidayTF = new JTextField();
-		holidayTF.setEditable(false);
-		holidayTF.setBounds(142, 317, 86, 20);
-		contentPane.add(holidayTF);
-		holidayTF.setColumns(10);
-
-		JLabel lblLegalHoliday = new JLabel("Legal Holiday:");
-		lblLegalHoliday.setBounds(23, 347, 82, 19);
-		contentPane.add(lblLegalHoliday);
-
-		legalHolTF = new JTextField();
-		legalHolTF.setEditable(false);
-		legalHolTF.setBounds(142, 348, 86, 20);
-		contentPane.add(legalHolTF);
-		legalHolTF.setColumns(10);
-
-		JLabel lblEmployeeContribution = new JLabel("Employee Contribution");
-		lblEmployeeContribution.setFont(new Font("Dialog", Font.BOLD, 12));
-		lblEmployeeContribution.setBounds(276, 194, 136, 19);
-		contentPane.add(lblEmployeeContribution);
-
-		JLabel lblSss = new JLabel("SSS:");
-		lblSss.setBounds(276, 227, 65, 19);
-		contentPane.add(lblSss);
-
-		sssTF = new JTextField();
-		sssTF.setEditable(false);
-		sssTF.setBounds(390, 224, 86, 20);
-		contentPane.add(sssTF);
-		sssTF.setColumns(10);
-
-		JLabel lblPhilhealth = new JLabel("PhilHealth:");
-		lblPhilhealth.setBounds(276, 259, 65, 17);
-		contentPane.add(lblPhilhealth);
-
-		phTF = new JTextField();
-		phTF.setEditable(false);
-		phTF.setBounds(390, 256, 86, 20);
-		contentPane.add(phTF);
-		phTF.setColumns(10);
-
-		JLabel lblWithholdingTax = new JLabel("Withholding Tax:");
-		lblWithholdingTax.setBounds(276, 289, 95, 17);
-		contentPane.add(lblWithholdingTax);
-
-		withHoldTF = new JTextField();
-		withHoldTF.setEditable(false);
-		withHoldTF.setBounds(390, 286, 86, 20);
-		contentPane.add(withHoldTF);
-		withHoldTF.setColumns(10);
-
-		JLabel lblPagibigFund = new JLabel("Pagibig Fund:");
-		lblPagibigFund.setBounds(276, 319, 95, 17);
-		contentPane.add(lblPagibigFund);
-
-		pagibigTF = new JTextField();
-		pagibigTF.setEditable(false);
-		pagibigTF.setBounds(390, 316, 86, 20);
-		contentPane.add(pagibigTF);
-		pagibigTF.setColumns(10);
-
-		JLabel lblPagibigLoan = new JLabel("Pagibig Loan:");
-		lblPagibigLoan.setBounds(276, 349, 95, 17);
-		contentPane.add(lblPagibigLoan);
-
-		pagibigloanTF = new JTextField();
-		pagibigloanTF.setEditable(false);
-		pagibigloanTF.setBounds(390, 346, 86, 20);
-		contentPane.add(pagibigloanTF);
-		pagibigloanTF.setColumns(10);
-
-		JLabel lblSssLoan = new JLabel("SSS Loan:");
-		lblSssLoan.setBounds(276, 379, 95, 17);
-		contentPane.add(lblSssLoan);
-
-		sssloanTF = new JTextField();
-		sssloanTF.setEditable(false);
-		sssloanTF.setBounds(390, 376, 86, 20);
-		contentPane.add(sssloanTF);
-		sssloanTF.setColumns(10);
-
-		JLabel lblDeduction = new JLabel("Deduction:");
-		lblDeduction.setBounds(276, 407, 95, 19);
-		contentPane.add(lblDeduction);
-
-		deducTF = new JTextField();
-		deducTF.setEditable(false);
-		deducTF.setBounds(390, 406, 86, 20);
-		contentPane.add(deducTF);
-		deducTF.setColumns(10);
-
-		JLabel lblOtherDeduction = new JLabel("Other Deduction:");
-		lblOtherDeduction.setBounds(276, 437, 95, 19);
-		contentPane.add(lblOtherDeduction);
-
-		deduc2TF = new JTextField();
-		deduc2TF.setEditable(false);
-		deduc2TF.setBounds(390, 436, 86, 20);
-		contentPane.add(deduc2TF);
-		deduc2TF.setColumns(10);
-
-		JLabel lblTotalDeduction = new JLabel("Total Deduction:");
-		lblTotalDeduction.setFont(new Font("Dialog", Font.BOLD, 12));
-		lblTotalDeduction.setBounds(276, 467, 95, 19);
-		contentPane.add(lblTotalDeduction);
-
-		totaldeducTF = new JTextField();
-		totaldeducTF.setEditable(false);
-		totaldeducTF.setBounds(390, 467, 86, 20);
-		contentPane.add(totaldeducTF);
-		totaldeducTF.setColumns(10);
-
-		JLabel lblNetPay = new JLabel("Net Pay:");
-		lblNetPay.setFont(new Font("Dialog", Font.BOLD, 12));
-		lblNetPay.setBounds(276, 497, 95, 19);
-		contentPane.add(lblNetPay);
-
-		npayTF = new JTextField();
-		npayTF.setEditable(false);
-		npayTF.setBounds(390, 498, 86, 20);
-		contentPane.add(npayTF);
-		npayTF.setColumns(10);
-
-		JLabel lblTotalOtPay = new JLabel("Total OT Pay:");
-		lblTotalOtPay.setFont(new Font("Dialog", Font.BOLD, 12));
-		lblTotalOtPay.setBounds(23, 406, 106, 19);
-		contentPane.add(lblTotalOtPay);
-
-		totalOTTF = new JTextField();
-		totalOTTF.setEditable(false);
-		totalOTTF.setBounds(142, 405, 86, 20);
-		contentPane.add(totalOTTF);
-		totalOTTF.setColumns(10);
-
-		JLabel lblAllowance = new JLabel("Allowance:");
-		lblAllowance.setBounds(23, 438, 106, 17);
-		contentPane.add(lblAllowance);
-
-		allowTF = new JTextField();
-		allowTF.setEditable(false);
-		allowTF.setBounds(142, 435, 86, 20);
-		contentPane.add(allowTF);
-		allowTF.setColumns(10);
-
-		JLabel lblOtherPay = new JLabel("Other Pay:");
-		lblOtherPay.setBounds(23, 468, 95, 17);
-		contentPane.add(lblOtherPay);
-
-		otherTF = new JTextField();
-		otherTF.setEditable(false);
-		otherTF.setBounds(142, 465, 86, 20);
-		contentPane.add(otherTF);
-		otherTF.setColumns(10);
-
-		JLabel lblGrossPay = new JLabel("Gross Pay:");
-		lblGrossPay.setFont(new Font("Dialog", Font.BOLD, 12));
-		lblGrossPay.setBounds(23, 496, 106, 19);
-		contentPane.add(lblGrossPay);
-
-		grossTF = new JTextField();
-		grossTF.setEditable(false);
-		grossTF.setBounds(142, 496, 86, 20);
-		contentPane.add(grossTF);
-		grossTF.setColumns(10);
-
-		JLabel lblEmployerContribution = new JLabel("Employer Contribution");
-		lblEmployerContribution.setFont(new Font("Dialog", Font.BOLD, 12));
-		lblEmployerContribution.setBounds(562, 190, 162, 26);
-		contentPane.add(lblEmployerContribution);
-
-		JLabel lblSss_1 = new JLabel("SSS:");
-		lblSss_1.setBounds(541, 227, 82, 19);
-		contentPane.add(lblSss_1);
-
-		sss2TF = new JTextField();
-		sss2TF.setEditable(false);
-		sss2TF.setBounds(638, 224, 86, 20);
-		contentPane.add(sss2TF);
-		sss2TF.setColumns(10);
-
-		JLabel lblPhilhealth_1 = new JLabel("PhilHealth");
-		lblPhilhealth_1.setBounds(541, 259, 82, 17);
-		contentPane.add(lblPhilhealth_1);
-
-		ph2TF = new JTextField();
-		ph2TF.setEditable(false);
-		ph2TF.setBounds(638, 256, 86, 20);
-		contentPane.add(ph2TF);
-		ph2TF.setColumns(10);
-
-		JLabel lblPagibigFund_1 = new JLabel("Pagibig Fund");
-		lblPagibigFund_1.setBounds(541, 289, 82, 17);
-		contentPane.add(lblPagibigFund_1);
-
-		pagibig2TF = new JTextField();
-		pagibig2TF.setEditable(false);
-		pagibig2TF.setBounds(638, 286, 86, 20);
-		contentPane.add(pagibig2TF);
-		pagibig2TF.setColumns(10);
 
 		JButton btnFirst = new JButton("First");
 		btnFirst.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				npTF.setText("");
 				try {
 
 					if (rs.first()) {
 
 						empNameTF.setText(rs.getString("empname"));
 						idTF.setText(rs.getString("id"));
-						rateTF.setText(rs.getString("rate"));
-						nofdaysTF.setText(rs.getString("nofdays"));
-						otTF.setText(rs.getString("regularot"));
-						holidayTF.setText(rs.getString("sholiday"));
-						legalHolTF.setText(rs.getString("lholiday"));
+						bpTF.setText(rs.getString("basicpay"));
+						allowTF.setText(rs.getString("allowance"));
+						otTF.setText(rs.getString("overtime"));
 						sssTF.setText(rs.getString("sss"));
 						phTF.setText(rs.getString("phealth"));
-						withHoldTF.setText(rs.getString("wholdtax"));
-						pagibigTF.setText(rs.getString("pagibigf"));
-						pagibigloanTF.setText(rs.getString("pagibigl"));
-						sssloanTF.setText(rs.getString("sssl"));
-						deducTF.setText(rs.getString("deduction"));
-						deduc2TF.setText(rs.getString("otherdeduction"));
-						totaldeducTF.setText(rs.getString("tdeduc"));
-						npayTF.setText(rs.getString("netpay"));
-						totalOTTF.setText(rs.getString("totalotpay"));
-						allowTF.setText(rs.getString("allowance"));
-						otherTF.setText(rs.getString("otherpay"));
-						grossTF.setText(rs.getString("grosspay"));
-						sss2TF.setText(rs.getString("sss1"));
-						ph2TF.setText(rs.getString("phealth1"));
-						pagibig2TF.setText(rs.getString("pagibigf1"));
+						hdmfTF.setText(rs.getString("hdmf"));
+						taxTF.setText(rs.getString("tax"));
 					}
 				} catch (Exception ex) {
 
@@ -440,34 +200,20 @@ public class AdminProfileUI extends JFrame {
 		JButton btnPrev = new JButton("Prev");
 		btnPrev.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				npTF.setText("");
 				try {
 
 					if (rs.previous()) {
 
 						empNameTF.setText(rs.getString("empname"));
 						idTF.setText(rs.getString("id"));
-						rateTF.setText(rs.getString("rate"));
-						nofdaysTF.setText(rs.getString("nofdays"));
-						otTF.setText(rs.getString("regularot"));
-						holidayTF.setText(rs.getString("sholiday"));
-						legalHolTF.setText(rs.getString("lholiday"));
+						bpTF.setText(rs.getString("basicpay"));
+						allowTF.setText(rs.getString("allowance"));
+						otTF.setText(rs.getString("overtime"));
 						sssTF.setText(rs.getString("sss"));
 						phTF.setText(rs.getString("phealth"));
-						withHoldTF.setText(rs.getString("wholdtax"));
-						pagibigTF.setText(rs.getString("pagibigf"));
-						pagibigloanTF.setText(rs.getString("pagibigl"));
-						sssloanTF.setText(rs.getString("sssl"));
-						deducTF.setText(rs.getString("deduction"));
-						deduc2TF.setText(rs.getString("otherdeduction"));
-						totaldeducTF.setText(rs.getString("tdeduc"));
-						npayTF.setText(rs.getString("netpay"));
-						totalOTTF.setText(rs.getString("totalotpay"));
-						allowTF.setText(rs.getString("allowance"));
-						otherTF.setText(rs.getString("otherpay"));
-						grossTF.setText(rs.getString("grosspay"));
-						sss2TF.setText(rs.getString("sss1"));
-						ph2TF.setText(rs.getString("phealth1"));
-						pagibig2TF.setText(rs.getString("pagibigf1"));
+						hdmfTF.setText(rs.getString("hdmf"));
+						taxTF.setText(rs.getString("tax"));
 
 					} else {
 						rs.next();
@@ -484,34 +230,20 @@ public class AdminProfileUI extends JFrame {
 		JButton btnNext = new JButton("Next");
 		btnNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				npTF.setText("");
 				try {
 
 					if (rs.next()) {
 
 						empNameTF.setText(rs.getString("empname"));
 						idTF.setText(rs.getString("id"));
-						rateTF.setText(rs.getString("rate"));
-						nofdaysTF.setText(rs.getString("nofdays"));
-						otTF.setText(rs.getString("regularot"));
-						holidayTF.setText(rs.getString("sholiday"));
-						legalHolTF.setText(rs.getString("lholiday"));
+						bpTF.setText(rs.getString("basicpay"));
+						allowTF.setText(rs.getString("allowance"));
+						otTF.setText(rs.getString("overtime"));
 						sssTF.setText(rs.getString("sss"));
 						phTF.setText(rs.getString("phealth"));
-						withHoldTF.setText(rs.getString("wholdtax"));
-						pagibigTF.setText(rs.getString("pagibigf"));
-						pagibigloanTF.setText(rs.getString("pagibigl"));
-						sssloanTF.setText(rs.getString("sssl"));
-						deducTF.setText(rs.getString("deduction"));
-						deduc2TF.setText(rs.getString("otherdeduction"));
-						totaldeducTF.setText(rs.getString("tdeduc"));
-						npayTF.setText(rs.getString("netpay"));
-						totalOTTF.setText(rs.getString("totalotpay"));
-						allowTF.setText(rs.getString("allowance"));
-						otherTF.setText(rs.getString("otherpay"));
-						grossTF.setText(rs.getString("grosspay"));
-						sss2TF.setText(rs.getString("sss1"));
-						ph2TF.setText(rs.getString("phealth1"));
-						pagibig2TF.setText(rs.getString("pagibigf1"));
+						hdmfTF.setText(rs.getString("hdmf"));
+						taxTF.setText(rs.getString("tax"));
 
 					} else {
 						rs.previous();
@@ -529,35 +261,21 @@ public class AdminProfileUI extends JFrame {
 		JButton btnLast = new JButton("Last");
 		btnLast.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				npTF.setText("");
 				try {
 
 					if (rs.last()) {
 
 						empNameTF.setText(rs.getString("empname"));
 						idTF.setText(rs.getString("id"));
-						rateTF.setText(rs.getString("rate"));
-						nofdaysTF.setText(rs.getString("nofdays"));
-						otTF.setText(rs.getString("regularot"));
-						holidayTF.setText(rs.getString("sholiday"));
-						legalHolTF.setText(rs.getString("lholiday"));
+						bpTF.setText(rs.getString("basicpay"));
+						allowTF.setText(rs.getString("allowance"));
+						otTF.setText(rs.getString("overtime"));
 						sssTF.setText(rs.getString("sss"));
 						phTF.setText(rs.getString("phealth"));
-						withHoldTF.setText(rs.getString("wholdtax"));
-						pagibigTF.setText(rs.getString("pagibigf"));
-						pagibigloanTF.setText(rs.getString("pagibigl"));
-						sssloanTF.setText(rs.getString("sssl"));
-						deducTF.setText(rs.getString("deduction"));
-						deduc2TF.setText(rs.getString("otherdeduction"));
-						totaldeducTF.setText(rs.getString("tdeduc"));
-						npayTF.setText(rs.getString("netpay"));
-						totalOTTF.setText(rs.getString("totalotpay"));
-						allowTF.setText(rs.getString("allowance"));
-						otherTF.setText(rs.getString("otherpay"));
-						grossTF.setText(rs.getString("grosspay"));
-						sss2TF.setText(rs.getString("sss1"));
-						ph2TF.setText(rs.getString("phealth1"));
-						pagibig2TF.setText(rs.getString("pagibigf1"));
+						hdmfTF.setText(rs.getString("hdmf"));
+						taxTF.setText(rs.getString("tax"));
+
 					}
 				} catch (Exception ex) {
 
@@ -570,10 +288,124 @@ public class AdminProfileUI extends JFrame {
 		JButton btnGetEmp = new JButton("Get All Employee List");
 		btnGetEmp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				new EmpListUI();
+				dispose();
 			}
 		});
 		btnGetEmp.setBounds(481, 15, 281, 59);
 		contentPane.add(btnGetEmp);
+
+		bpTF = new JTextField();
+		bpTF.setBounds(203, 262, 136, 26);
+		bpTF.setEditable(false);
+		contentPane.add(bpTF);
+		bpTF.setColumns(10);
+
+		JLabel lblBasicPay = new JLabel("Basic Pay:");
+		lblBasicPay.setBounds(134, 267, 65, 16);
+		contentPane.add(lblBasicPay);
+
+		JLabel lblAllowance = new JLabel("Allowance:");
+		lblAllowance.setBounds(134, 297, 65, 19);
+		contentPane.add(lblAllowance);
+
+		allowTF = new JTextField();
+		allowTF.setBounds(203, 293, 136, 26);
+		allowTF.setEditable(false);
+		contentPane.add(allowTF);
+		allowTF.setColumns(10);
+
+		JLabel lblOvertime = new JLabel("Overtime: ");
+		lblOvertime.setBounds(134, 330, 65, 19);
+		contentPane.add(lblOvertime);
+
+		otTF = new JTextField();
+		otTF.setColumns(10);
+		otTF.setEditable(false);
+		otTF.setBounds(203, 326, 136, 26);
+		contentPane.add(otTF);
+
+		JLabel lblDeductions = new JLabel("Deductions");
+		lblDeductions.setBounds(477, 221, 112, 26);
+		contentPane.add(lblDeductions);
+
+		JLabel lblSss = new JLabel("SSS:");
+		lblSss.setBounds(394, 268, 52, 20);
+		contentPane.add(lblSss);
+
+		sssTF = new JTextField();
+		sssTF.setEditable(false);
+		sssTF.setColumns(10);
+		sssTF.setBounds(456, 262, 136, 26);
+		contentPane.add(sssTF);
+
+		JLabel lblPhilhealth = new JLabel("PhilHealth");
+		lblPhilhealth.setBounds(394, 298, 65, 17);
+		contentPane.add(lblPhilhealth);
+
+		phTF = new JTextField();
+		phTF.setColumns(10);
+		phTF.setEditable(false);
+		phTF.setBounds(456, 293, 136, 26);
+		contentPane.add(phTF);
+
+		JLabel lblHdmf = new JLabel("HDMF:");
+		lblHdmf.setBounds(394, 331, 55, 17);
+		contentPane.add(lblHdmf);
+
+		hdmfTF = new JTextField();
+		hdmfTF.setColumns(10);
+		hdmfTF.setEditable(false);
+		hdmfTF.setBounds(456, 326, 136, 26);
+		contentPane.add(hdmfTF);
+
+		JLabel lblNetpay = new JLabel("NetPay");
+		lblNetpay.setBounds(249, 439, 65, 19);
+		contentPane.add(lblNetpay);
+
+		JButton btnCompute = new JButton("Compute");
+		btnCompute.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				double bp = Double.parseDouble(bpTF.getText());
+				double allow = Double.parseDouble(allowTF.getText());
+				double ot = Double.parseDouble(otTF.getText());
+				double sss = Double.parseDouble(sssTF.getText());
+				double ph = Double.parseDouble(phTF.getText());
+				double hdmf = Double.parseDouble(hdmfTF.getText());
+				double partialtax = Double.parseDouble(taxTF.getText());
+				double tax = partialtax / 100;
+
+				double redeem = bp + allow + ot;
+				double xtax = redeem * tax;
+				double deduc1 = sss + ph + hdmf + xtax;
+				double netpay = redeem - deduc1;
+
+				npTF.setText("" + netpay);
+
+			}
+		});
+		btnCompute.setBounds(323, 476, 112, 26);
+		contentPane.add(btnCompute);
+
+		npTF = new JTextField();
+		npTF.setColumns(10);
+		npTF.setEditable(false);
+		npTF.setBounds(313, 435, 136, 26);
+		contentPane.add(npTF);
+
+		JLabel lblTax = new JLabel("Tax");
+		lblTax.setBounds(394, 363, 54, 19);
+		contentPane.add(lblTax);
+
+		taxTF = new JTextField();
+		taxTF.setEditable(false);
+		taxTF.setColumns(10);
+		taxTF.setBounds(456, 359, 46, 26);
+		contentPane.add(taxTF);
+		
+		JLabel label = new JLabel("%");
+		label.setBounds(512, 363, 20, 22);
+		contentPane.add(label);
 
 		display();
 		// contentPane.add(background);
@@ -590,30 +422,16 @@ public class AdminProfileUI extends JFrame {
 		btnEdit.setEnabled(false);
 		btnSave.setEnabled(true);
 		btnCancel.setEnabled(true);
-		empNameTF.setEditable(true);
-		idTF.setEditable(true);
-		rateTF.setEditable(true);
-		nofdaysTF.setEditable(true);
-		otTF.setEditable(true);
-		holidayTF.setEditable(true);
-		legalHolTF.setEditable(true);
-		totalOTTF.setEditable(true);
+		// empNameTF.setEditable(true);
+		// idTF.setEditable(true);
+		bpTF.setEditable(true);
 		allowTF.setEditable(true);
-		otherTF.setEditable(true);
-		grossTF.setEditable(true);
+		otTF.setEditable(true);
 		sssTF.setEditable(true);
 		phTF.setEditable(true);
-		withHoldTF.setEditable(true);
-		pagibigTF.setEditable(true);
-		pagibigloanTF.setEditable(true);
-		sssloanTF.setEditable(true);
-		deducTF.setEditable(true);
-		deduc2TF.setEditable(true);
-		totaldeducTF.setEditable(true);
-		npayTF.setEditable(true);
-		sss2TF.setEditable(true);
-		ph2TF.setEditable(true);
-		pagibig2TF.setEditable(true);
+		hdmfTF.setEditable(true);
+		taxTF.setEditable(true);
+		npTF.setText("");
 
 	}
 
@@ -621,30 +439,16 @@ public class AdminProfileUI extends JFrame {
 		btnEdit.setEnabled(true);
 		btnSave.setEnabled(false);
 		btnCancel.setEnabled(false);
-		empNameTF.setEditable(false);
-		idTF.setEditable(false);
-		rateTF.setEditable(false);
-		nofdaysTF.setEditable(false);
-		otTF.setEditable(false);
-		holidayTF.setEditable(false);
-		legalHolTF.setEditable(false);
-		totalOTTF.setEditable(false);
+		// empNameTF.setEditable(false);
+		// idTF.setEditable(false);
+		bpTF.setEditable(false);
 		allowTF.setEditable(false);
-		otherTF.setEditable(false);
-		grossTF.setEditable(false);
+		otTF.setEditable(false);
 		sssTF.setEditable(false);
 		phTF.setEditable(false);
-		withHoldTF.setEditable(false);
-		pagibigTF.setEditable(false);
-		pagibigloanTF.setEditable(false);
-		sssloanTF.setEditable(false);
-		deducTF.setEditable(false);
-		deduc2TF.setEditable(false);
-		totaldeducTF.setEditable(false);
-		npayTF.setEditable(false);
-		sss2TF.setEditable(false);
-		ph2TF.setEditable(false);
-		pagibig2TF.setEditable(false);
+		hdmfTF.setEditable(false);
+		taxTF.setEditable(false);
+		npTF.setText("");
 
 	}
 
@@ -667,7 +471,7 @@ public class AdminProfileUI extends JFrame {
 		con = DriverManager.getConnection("jdbc:db2://localhost:50000/payroll", "Charlie", "1231234");
 		st = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
-		String sql = "select * from employees";
+		String sql = "select * from employees order by empname";
 		rs = st.executeQuery(sql);
 
 		try {
@@ -676,28 +480,13 @@ public class AdminProfileUI extends JFrame {
 
 				empNameTF.setText(rs.getString("empname"));
 				idTF.setText(rs.getString("id"));
-				rateTF.setText(rs.getString("rate"));
-				nofdaysTF.setText(rs.getString("nofdays"));
-				otTF.setText(rs.getString("regularot"));
-				holidayTF.setText(rs.getString("sholiday"));
-				legalHolTF.setText(rs.getString("lholiday"));
+				bpTF.setText(rs.getString("basicpay"));
+				allowTF.setText(rs.getString("allowance"));
+				otTF.setText(rs.getString("overtime"));
 				sssTF.setText(rs.getString("sss"));
 				phTF.setText(rs.getString("phealth"));
-				withHoldTF.setText(rs.getString("wholdtax"));
-				pagibigTF.setText(rs.getString("pagibigf"));
-				pagibigloanTF.setText(rs.getString("pagibigl"));
-				sssloanTF.setText(rs.getString("sssl"));
-				deducTF.setText(rs.getString("deduction"));
-				deduc2TF.setText(rs.getString("otherdeduction"));
-				totaldeducTF.setText(rs.getString("tdeduc"));
-				npayTF.setText(rs.getString("netpay"));
-				totalOTTF.setText(rs.getString("totalotpay"));
-				allowTF.setText(rs.getString("allowance"));
-				otherTF.setText(rs.getString("otherpay"));
-				grossTF.setText(rs.getString("grosspay"));
-				sss2TF.setText(rs.getString("sss1"));
-				ph2TF.setText(rs.getString("phealth1"));
-				pagibig2TF.setText(rs.getString("pagibigf1"));
+				hdmfTF.setText(rs.getString("hdmf"));
+				taxTF.setText(rs.getString("tax"));
 			}
 
 		} catch (SQLException ex) {

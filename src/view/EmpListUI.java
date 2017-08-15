@@ -30,6 +30,7 @@ public class EmpListUI extends JFrame {
 	private JTable jtbl;
 
 	public EmpListUI() {
+		setTitle("Employee List");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 627, 458);
 		contentPane = new JPanel();
@@ -44,7 +45,7 @@ public class EmpListUI extends JFrame {
 		try {
 			Class.forName("com.ibm.db2.jcc.DB2Driver");
 			Connection con = DriverManager.getConnection("jdbc:db2://localhost:50000/payroll", "Charlie", "1231234");
-			PreparedStatement pstm = con.prepareStatement("SELECT * FROM employees");
+			PreparedStatement pstm = con.prepareStatement("SELECT * FROM employees order by empname");
 			ResultSet Rs = pstm.executeQuery();
 			while (Rs.next()) {
 				model.addRow(new Object[] { Rs.getString("empname"), Rs.getString("id") });
@@ -63,7 +64,7 @@ public class EmpListUI extends JFrame {
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					new AdminProfileUI1();
+					new AdminProfileUI();
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

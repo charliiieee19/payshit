@@ -197,17 +197,24 @@ public class AdminLoginUI extends JFrame {
 			if (validUser.getUsername().equals(user.getUsername())
 					&& validUser.getPassword().equals(user.getPassword()))
 				displayMain(adminDA.getUser(user));
-
-			else
+			
+			
+			else {
 				JOptionPane.showMessageDialog(null, "Invalid username or password", "Error Message",
-						JOptionPane.INFORMATION_MESSAGE);
-		} catch (Exception e) {
-			// e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Invalid username or password", "Error Message",
-					JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.ERROR_MESSAGE);
+			}
+		
 		}
-
+		 catch (Exception e) {
+			 e.printStackTrace();
+			 JOptionPane.showMessageDialog(null, "Invalid username or password", "Error Message",
+						JOptionPane.ERROR_MESSAGE);
+			
+		}
 	}
+	
+
+	
 
 	public void displayMain(Admin user) throws ClassNotFoundException, SQLException {
 		new AdminProfileUI();
