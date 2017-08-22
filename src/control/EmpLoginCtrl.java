@@ -26,7 +26,7 @@ public class EmpLoginCtrl {
 			empList = new ArrayList<Employee>();
 			PreparedStatement s = null;
 			String query;
-			query = "SELECT * FROM Emp";
+			query = "SELECT * FROM empaccount";
 
 			s = connection.prepareStatement(query);
 			rs = s.executeQuery();

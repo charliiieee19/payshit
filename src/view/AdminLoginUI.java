@@ -1,40 +1,41 @@
 package view;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.basic.BasicButtonUI;
-
-import control.AdminLoginCtrl;
-import model.Admin;
-
-import javax.swing.JTextField;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
 import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-
-import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.awt.event.ActionEvent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.basic.BasicButtonUI;
 
 public class AdminLoginUI extends JFrame {
 
 	private JPanel contentPane;
 	private JLabel background;
-	private JTextField textField;
-	private JPasswordField passwordField;
-	private Connection connection;
-	private Admin user;
-	private AdminLoginCtrl adminDA;
-
+	private JTextField userTF;
+	private JPasswordField passTF;
+	
 	public AdminLoginUI() {
 		setTitle("Payroll System");
 		setIconImage(Toolkit.getDefaultToolkit()
@@ -50,10 +51,10 @@ public class AdminLoginUI extends JFrame {
 		contentPane.setLayout(null);
 		centerFrame();
 
-		textField = new JTextField();
-		textField.setBounds(117, 83, 169, 31);
-		contentPane.add(textField);
-		textField.setColumns(10);
+		userTF = new JTextField();
+		userTF.setBounds(117, 83, 169, 31);
+		contentPane.add(userTF);
+		userTF.setColumns(10);
 
 		JLabel lblEmployeeLogin = new JLabel("Admin Login:");
 		lblEmployeeLogin.setBounds(28, 23, 101, 31);
@@ -70,15 +71,14 @@ public class AdminLoginUI extends JFrame {
 		lblPassword.setForeground(Color.WHITE);
 		contentPane.add(lblPassword);
 
-		passwordField = new JPasswordField();
-		passwordField.setBounds(117, 125, 169, 31);
-		contentPane.add(passwordField);
+		passTF = new JPasswordField();
+		passTF.setBounds(117, 125, 169, 31);
+		contentPane.add(passTF);
 
 		JButton btnLogin = new JButton("Login");
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				validateUser();
-				dispose();
+				login();
 			}
 		});
 		btnLogin.setFont(new Font("Calibri", Font.BOLD, 14));
@@ -105,7 +105,16 @@ public class AdminLoginUI extends JFrame {
 		JButton btnExit = new JButton("Exit");
 		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dispose();
+				int dialogButton = JOptionPane.showConfirmDialog(null, "Are you sure to exit?", "Warning",
+						JOptionPane.YES_NO_OPTION);
+
+				if (dialogButton == JOptionPane.YES_OPTION) {
+
+					dispose();
+				} else {
+					disableEvents(dialogButton);
+				}
+
 			}
 		});
 		btnExit.setFont(new Font("Calibri", Font.BOLD, 14));
@@ -163,61 +172,37 @@ public class AdminLoginUI extends JFrame {
 		}
 	}
 
-	public Connection getConnection() {
-		try {
-			Class.forName("com.ibm.db2.jcc.DB2Driver");
-			connection = DriverManager.getConnection("jdbc:db2://localhost:50000/payroll", "Charlie", "1231234");
-
-		} catch (ClassNotFoundException e) {
-			// e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return connection;
-	}
-
-	public void setConnection(Connection connection) {
-		this.connection = connection;
-	}
-
-	public void validateUser() {
-		user = new Admin();
-		user.setUsername(textField.getText());
-		user.setPassword(passwordField.getText());
-
-		// instantiate persistent objects
-		adminDA = new AdminLoginCtrl(getConnection(), user.getUsername());
-
-		Admin validUser = new Admin();
-		validUser = adminDA.getUser(user);
+	
+	public void login() {
+		String strDriver = "com.ibm.db2.jcc.DB2Driver";
+		Connection conn;
+		Statement stmt;
+		ResultSet rs;
+		String strUrl = "jdbc:db2://localhost:50000/payroll";
+		String user = "Charlie";
+		String pass = "1231234";
+		String usern = userTF.getText();
+		String passw = passTF.getText();
 
 		try {
+			Class.forName(strDriver);
+			conn = DriverManager.getConnection(strUrl, user, pass);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("Select username,password from admin where username='" + usern
+					+ "' and password='" + passw + "'");
 
-			if (validUser.getUsername().equals(user.getUsername())
-					&& validUser.getPassword().equals(user.getPassword()))
-				displayMain(adminDA.getUser(user));
-			
-			
-			else {
-				JOptionPane.showMessageDialog(null, "Invalid username or password", "Error Message",
-						JOptionPane.ERROR_MESSAGE);
+			if (rs.next()) {
+
+				dispose();
+				new AdminProfileUI();
+				JOptionPane.showMessageDialog(null, "Welcome " + rs.getString("username"));
+			} else {
+				JOptionPane.showMessageDialog(null, "Invalid Username or Password!");
 			}
-		
+			rs.close();
+			conn.close();
+		} catch (Exception e) {
+			System.out.print(e.toString());
 		}
-		 catch (Exception e) {
-			 e.printStackTrace();
-			 JOptionPane.showMessageDialog(null, "Invalid username or password", "Error Message",
-						JOptionPane.ERROR_MESSAGE);
-			
-		}
-	}
-	
-
-	
-
-	public void displayMain(Admin user) throws ClassNotFoundException, SQLException {
-		new AdminProfileUI();
-
 	}
 }

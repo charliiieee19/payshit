@@ -1,34 +1,25 @@
 package view;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Font;
 import java.awt.GraphicsEnvironment;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JSeparator;
-import java.awt.Panel;
 import java.awt.Point;
 import java.awt.Toolkit;
-import javax.swing.JComboBox;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.awt.event.ActionEvent;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
 public class EmpProfileUI extends JFrame {
 
@@ -45,7 +36,6 @@ public class EmpProfileUI extends JFrame {
 	private JTextField sssTF;
 	private JTextField phTF;
 	private JTextField hdmfTF;
-	private JTextField npTF;
 	private JTextField taxTF;
 
 	public EmpProfileUI() throws ClassNotFoundException, SQLException {
@@ -150,40 +140,6 @@ public class EmpProfileUI extends JFrame {
 		hdmfTF.setBounds(479, 253, 136, 26);
 		contentPane.add(hdmfTF);
 
-		JLabel lblNetpay = new JLabel("NetPay");
-		lblNetpay.setBounds(272, 366, 65, 19);
-		contentPane.add(lblNetpay);
-
-		JButton btnCompute = new JButton("Compute");
-		btnCompute.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				double bp = Double.parseDouble(bpTF.getText());
-				double allow = Double.parseDouble(allowTF.getText());
-				double ot = Double.parseDouble(otTF.getText());
-				double sss = Double.parseDouble(sssTF.getText());
-				double ph = Double.parseDouble(phTF.getText());
-				double hdmf = Double.parseDouble(hdmfTF.getText());
-				double partialtax = Double.parseDouble(taxTF.getText());
-				double tax = partialtax / 100;
-
-				double redeem = bp + allow + ot;
-				double xtax = redeem * tax;
-				double deduc1 = sss + ph + hdmf + xtax;
-				double netpay = redeem - deduc1;
-
-				npTF.setText("" + netpay);
-
-			}
-		});
-		btnCompute.setBounds(346, 403, 112, 26);
-		contentPane.add(btnCompute);
-
-		npTF = new JTextField();
-		npTF.setColumns(10);
-		npTF.setEditable(false);
-		npTF.setBounds(336, 362, 136, 26);
-		contentPane.add(npTF);
-
 		JLabel lblTax = new JLabel("Tax");
 		lblTax.setBounds(417, 290, 54, 19);
 		contentPane.add(lblTax);
@@ -193,10 +149,27 @@ public class EmpProfileUI extends JFrame {
 		taxTF.setColumns(10);
 		taxTF.setBounds(479, 286, 46, 26);
 		contentPane.add(taxTF);
-		
+
 		JLabel label = new JLabel("%");
 		label.setBounds(535, 290, 20, 22);
 		contentPane.add(label);
+		
+		JButton btnLogout = new JButton("Logout");
+		btnLogout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int dialogButton = JOptionPane.showConfirmDialog(null, "Are you sure to Logout?", "Warning",
+						JOptionPane.YES_NO_OPTION);
+
+				if (dialogButton == JOptionPane.YES_OPTION) {
+					new EmpLoginUI();
+					dispose();
+				} else {
+					disableEvents(dialogButton);
+				}
+			}
+		});
+		btnLogout.setBounds(535, 29, 93, 26);
+		contentPane.add(btnLogout);
 
 		display();
 		// contentPane.add(background);
@@ -209,7 +182,6 @@ public class EmpProfileUI extends JFrame {
 		new EmpProfileUI();
 	}
 
-	
 	private void centerFrame() {
 
 		Dimension windowSize = getSize();
@@ -222,26 +194,35 @@ public class EmpProfileUI extends JFrame {
 	}
 
 	public void display() throws ClassNotFoundException, SQLException {
+		String id = EmpLoginUI.userTF.getText();
+		String driver = "com.ibm.db2.jcc.DB2Driver";
+		Class.forName(driver);
+		
+		con = DriverManager.getConnection("jdbc:db2://localhost:50000/payroll", "Charlie", "1231234");
+		st = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
-		String dbURL = "jdbc:db2://localhost:50000/payroll";
-		String username = "Charlie";
-		String password = "1231234";
+		String sql = "select * from employees where id ="+id+"";
 		
-		try (Connection conn = DriverManager.getConnection(dbURL, username, password)) {
-			
-			String sql = "SELECT * FROM employees where id=?";
-			
-			Statement statement = conn.createStatement();
-			ResultSet result = statement.executeQuery(sql);
-			statement.setString(1, "123456789");
-		
-			
-			while (result.next()){
-				
+		rs = st.executeQuery(sql);
+
+
+		try {
+			rs.next();
+			{
+
+				empNameTF.setText(rs.getString("empname"));
+				idTF.setText(rs.getString("id"));
+				bpTF.setText(rs.getString("basicpay"));
+				allowTF.setText(rs.getString("allowance"));
+				otTF.setText(rs.getString("overtime"));
+				sssTF.setText(rs.getString("sss"));
+				phTF.setText(rs.getString("phealth"));
+				hdmfTF.setText(rs.getString("hdmf"));
+				taxTF.setText(rs.getString("tax"));
 			}
-			
+
 		} catch (SQLException ex) {
 			ex.printStackTrace();
-		}		
+		}
 	}
 }

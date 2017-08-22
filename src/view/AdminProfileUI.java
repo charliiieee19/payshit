@@ -1,34 +1,36 @@
 package view;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JSeparator;
-import java.awt.Panel;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
-import javax.swing.JComboBox;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractButton;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.basic.BasicButtonUI;
 
 public class AdminProfileUI extends JFrame {
 
@@ -36,7 +38,8 @@ public class AdminProfileUI extends JFrame {
 	private JTextField empNameTF;
 	private JTextField idTF;
 	private JLabel background;
-	private JButton btnSave, btnCancel, btnEdit;
+	private JButton btnSave, btnCancel, btnEdit, btnAdd, btnFirst, btnNext, btnPrev, btnLast, btnInsert, btnLogout,
+			btnCompute;
 	private Connection con;
 	private Statement st;
 	private ResultSet rs;
@@ -48,11 +51,12 @@ public class AdminProfileUI extends JFrame {
 	private JTextField hdmfTF;
 	private JTextField npTF;
 	private JTextField taxTF;
+	private JTextField grossTF;
 
 	public AdminProfileUI() throws ClassNotFoundException, SQLException {
 		setTitle("Edit Employee");
 		setIconImage(Toolkit.getDefaultToolkit()
-				.getImage("C:\\Users\\Charlie\\eclipse-workspace\\PayIdiot\\src\\Images\\one.jpg"));
+				.getImage("C:\\Users\\Charlie\\eclipse-workspace\\PayIdiot\\src\\Images\\dollar.png"));
 		background = new JLabel();
 		background
 				.setIcon(new ImageIcon("C:\\Users\\Charlie\\eclipse-workspace\\PayIdiot\\src\\Images\\empprofile.jpg"));
@@ -71,6 +75,10 @@ public class AdminProfileUI extends JFrame {
 				editButton();
 			}
 		});
+		btnEdit.setFont(new Font("Calibri", Font.BOLD, 14));
+		btnEdit.setBackground(Color.DARK_GRAY);
+		btnEdit.setForeground(Color.white);
+		btnEdit.setUI(new StyledButtonUI());
 		btnEdit.setBounds(10, 11, 95, 26);
 		contentPane.add(btnEdit);
 
@@ -106,7 +114,8 @@ public class AdminProfileUI extends JFrame {
 
 					int rowsUpdated = statement.executeUpdate();
 					if (rowsUpdated > 0) {
-						JOptionPane.showMessageDialog(null, "Record Saved...");
+						JOptionPane.showMessageDialog(null, "Record Updated", "Success",
+								JOptionPane.INFORMATION_MESSAGE);
 					}
 					display();
 
@@ -116,6 +125,10 @@ public class AdminProfileUI extends JFrame {
 
 			}
 		});
+		btnSave.setFont(new Font("Calibri", Font.BOLD, 14));
+		btnSave.setBackground(Color.DARK_GRAY);
+		btnSave.setForeground(Color.white);
+		btnSave.setUI(new StyledButtonUI());
 		btnSave.setEnabled(false);
 		btnSave.setBounds(115, 11, 95, 26);
 		contentPane.add(btnSave);
@@ -135,46 +148,64 @@ public class AdminProfileUI extends JFrame {
 				}
 			}
 		});
+		btnCancel.setFont(new Font("Calibri", Font.BOLD, 14));
+		btnCancel.setBackground(Color.DARK_GRAY);
+		btnCancel.setForeground(Color.white);
+		btnCancel.setUI(new StyledButtonUI());
 		btnCancel.setEnabled(false);
 		btnCancel.setBounds(220, 11, 106, 26);
 		contentPane.add(btnCancel);
 
-		JButton btnLogout = new JButton("Logout");
+		btnLogout = new JButton("Logout");
 		btnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new AdminLoginUI();
-				dispose();
+
+				int dialogButton = JOptionPane.showConfirmDialog(null, "Are you sure to Log out?", "Warning",
+						JOptionPane.YES_NO_OPTION);
+
+				if (dialogButton == JOptionPane.YES_OPTION) {
+					new AdminLoginUI();
+					dispose();
+				} else {
+					disableEvents(dialogButton);
+				}
+
 			}
 		});
+		btnLogout.setFont(new Font("Calibri", Font.BOLD, 14));
+		btnLogout.setBackground(Color.DARK_GRAY);
+		btnLogout.setForeground(Color.white);
+		btnLogout.setUI(new StyledButtonUI());
 		btnLogout.setBounds(336, 11, 112, 26);
 		contentPane.add(btnLogout);
 
 		JLabel lblEmpName = new JLabel("Emp Name");
-		lblEmpName.setBounds(23, 119, 65, 19);
+		lblEmpName.setBounds(22, 132, 65, 19);
 
 		contentPane.add(lblEmpName);
 
 		JLabel lblId = new JLabel("ID");
-		lblId.setBounds(23, 149, 46, 14);
+		lblId.setBounds(22, 162, 46, 14);
 
 		contentPane.add(lblId);
 
 		empNameTF = new JTextField();
 		empNameTF.setEditable(false);
-		empNameTF.setBounds(92, 118, 193, 20);
+		empNameTF.setBounds(91, 131, 193, 20);
 		contentPane.add(empNameTF);
 		empNameTF.setColumns(10);
 
 		idTF = new JTextField();
 		idTF.setEditable(false);
-		idTF.setBounds(92, 146, 193, 20);
+		idTF.setBounds(91, 159, 193, 20);
 		contentPane.add(idTF);
 		idTF.setColumns(10);
 
-		JButton btnFirst = new JButton("First");
+		btnFirst = new JButton("First");
 		btnFirst.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				npTF.setText("");
+				grossTF.setText("");
 				try {
 
 					if (rs.first()) {
@@ -194,13 +225,18 @@ public class AdminProfileUI extends JFrame {
 				}
 			}
 		});
+		btnFirst.setFont(new Font("Calibri", Font.BOLD, 14));
+		btnFirst.setBackground(Color.DARK_GRAY);
+		btnFirst.setForeground(Color.white);
+		btnFirst.setUI(new StyledButtonUI());
 		btnFirst.setBounds(10, 48, 95, 26);
 		contentPane.add(btnFirst);
 
-		JButton btnPrev = new JButton("Prev");
+		btnPrev = new JButton("Prev");
 		btnPrev.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				npTF.setText("");
+				grossTF.setText("");
 				try {
 
 					if (rs.previous()) {
@@ -224,13 +260,18 @@ public class AdminProfileUI extends JFrame {
 				}
 			}
 		});
+		btnPrev.setFont(new Font("Calibri", Font.BOLD, 14));
+		btnPrev.setBackground(Color.DARK_GRAY);
+		btnPrev.setForeground(Color.white);
+		btnPrev.setUI(new StyledButtonUI());
 		btnPrev.setBounds(115, 50, 95, 24);
 		contentPane.add(btnPrev);
 
-		JButton btnNext = new JButton("Next");
+		btnNext = new JButton("Next");
 		btnNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				npTF.setText("");
+				grossTF.setText("");
 				try {
 
 					if (rs.next()) {
@@ -255,13 +296,19 @@ public class AdminProfileUI extends JFrame {
 
 			}
 		});
+		btnNext.setFont(new Font("Calibri", Font.BOLD, 14));
+		btnNext.setBackground(Color.DARK_GRAY);
+		btnNext.setForeground(Color.white);
+		btnNext.setUI(new StyledButtonUI());
 		btnNext.setBounds(220, 48, 106, 26);
 		contentPane.add(btnNext);
 
-		JButton btnLast = new JButton("Last");
+		btnLast = new JButton("Last");
 		btnLast.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				npTF.setText("");
+				grossTF.setText("");
+
 				try {
 
 					if (rs.last()) {
@@ -282,6 +329,10 @@ public class AdminProfileUI extends JFrame {
 				}
 			}
 		});
+		btnLast.setFont(new Font("Calibri", Font.BOLD, 14));
+		btnLast.setBackground(Color.DARK_GRAY);
+		btnLast.setForeground(Color.white);
+		btnLast.setUI(new StyledButtonUI());
 		btnLast.setBounds(336, 48, 112, 26);
 		contentPane.add(btnLast);
 
@@ -292,10 +343,21 @@ public class AdminProfileUI extends JFrame {
 				dispose();
 			}
 		});
-		btnGetEmp.setBounds(481, 15, 281, 59);
+		btnGetEmp.setFont(new Font("Calibri", Font.BOLD, 14));
+		btnGetEmp.setBackground(Color.DARK_GRAY);
+		btnGetEmp.setForeground(Color.white);
+		btnGetEmp.setUI(new StyledButtonUI());
+		btnGetEmp.setBounds(481, 11, 281, 63);
 		contentPane.add(btnGetEmp);
 
 		bpTF = new JTextField();
+		bpTF.addKeyListener(new KeyAdapter() {
+			public void keyTyped(KeyEvent e) {
+				if (!Character.isDigit(e.getKeyChar()))
+					e.consume();
+
+			}
+		});
 		bpTF.setBounds(203, 262, 136, 26);
 		bpTF.setEditable(false);
 		contentPane.add(bpTF);
@@ -310,6 +372,12 @@ public class AdminProfileUI extends JFrame {
 		contentPane.add(lblAllowance);
 
 		allowTF = new JTextField();
+		allowTF.addKeyListener(new KeyAdapter() {
+			public void keyTyped(KeyEvent e) {
+				if (!Character.isDigit(e.getKeyChar()))
+					e.consume();
+			}
+		});
 		allowTF.setBounds(203, 293, 136, 26);
 		allowTF.setEditable(false);
 		contentPane.add(allowTF);
@@ -320,6 +388,12 @@ public class AdminProfileUI extends JFrame {
 		contentPane.add(lblOvertime);
 
 		otTF = new JTextField();
+		otTF.addKeyListener(new KeyAdapter() {
+			public void keyTyped(KeyEvent e) {
+				if (!Character.isDigit(e.getKeyChar()))
+					e.consume();
+			}
+		});
 		otTF.setColumns(10);
 		otTF.setEditable(false);
 		otTF.setBounds(203, 326, 136, 26);
@@ -334,6 +408,12 @@ public class AdminProfileUI extends JFrame {
 		contentPane.add(lblSss);
 
 		sssTF = new JTextField();
+		sssTF.addKeyListener(new KeyAdapter() {
+			public void keyTyped(KeyEvent e) {
+				if (!Character.isDigit(e.getKeyChar()))
+					e.consume();
+			}
+		});
 		sssTF.setEditable(false);
 		sssTF.setColumns(10);
 		sssTF.setBounds(456, 262, 136, 26);
@@ -344,6 +424,12 @@ public class AdminProfileUI extends JFrame {
 		contentPane.add(lblPhilhealth);
 
 		phTF = new JTextField();
+		phTF.addKeyListener(new KeyAdapter() {
+			public void keyTyped(KeyEvent e) {
+				if (!Character.isDigit(e.getKeyChar()))
+					e.consume();
+			}
+		});
 		phTF.setColumns(10);
 		phTF.setEditable(false);
 		phTF.setBounds(456, 293, 136, 26);
@@ -354,16 +440,22 @@ public class AdminProfileUI extends JFrame {
 		contentPane.add(lblHdmf);
 
 		hdmfTF = new JTextField();
+		hdmfTF.addKeyListener(new KeyAdapter() {
+			public void keyTyped(KeyEvent e) {
+				if (!Character.isDigit(e.getKeyChar()))
+					e.consume();
+			}
+		});
 		hdmfTF.setColumns(10);
 		hdmfTF.setEditable(false);
 		hdmfTF.setBounds(456, 326, 136, 26);
 		contentPane.add(hdmfTF);
 
 		JLabel lblNetpay = new JLabel("NetPay");
-		lblNetpay.setBounds(249, 439, 65, 19);
+		lblNetpay.setBounds(153, 431, 65, 19);
 		contentPane.add(lblNetpay);
 
-		JButton btnCompute = new JButton("Compute");
+		btnCompute = new JButton("Compute");
 		btnCompute.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				double bp = Double.parseDouble(bpTF.getText());
@@ -375,22 +467,28 @@ public class AdminProfileUI extends JFrame {
 				double partialtax = Double.parseDouble(taxTF.getText());
 				double tax = partialtax / 100;
 
-				double redeem = bp + allow + ot;
-				double xtax = redeem * tax;
-				double deduc1 = sss + ph + hdmf + xtax;
-				double netpay = redeem - deduc1;
+				double gross = bp + allow + ot;
+				double xtax = bp * tax;
+				double netpay = sss + ph + hdmf + xtax;
+
+				double grosstotal = gross - netpay;
 
 				npTF.setText("" + netpay);
+				grossTF.setText("" + grosstotal);
 
 			}
 		});
-		btnCompute.setBounds(323, 476, 112, 26);
+		btnCompute.setFont(new Font("Calibri", Font.BOLD, 14));
+		btnCompute.setBackground(Color.DARK_GRAY);
+		btnCompute.setForeground(Color.white);
+		btnCompute.setUI(new StyledButtonUI());
+		btnCompute.setBounds(323, 481, 112, 26);
 		contentPane.add(btnCompute);
 
 		npTF = new JTextField();
 		npTF.setColumns(10);
 		npTF.setEditable(false);
-		npTF.setBounds(313, 435, 136, 26);
+		npTF.setBounds(217, 427, 136, 26);
 		contentPane.add(npTF);
 
 		JLabel lblTax = new JLabel("Tax");
@@ -398,14 +496,71 @@ public class AdminProfileUI extends JFrame {
 		contentPane.add(lblTax);
 
 		taxTF = new JTextField();
+		taxTF.addKeyListener(new KeyAdapter() {
+			public void keyTyped(KeyEvent e) {
+				if (!Character.isDigit(e.getKeyChar()))
+					e.consume();
+			}
+		});
 		taxTF.setEditable(false);
 		taxTF.setColumns(10);
 		taxTF.setBounds(456, 359, 46, 26);
 		contentPane.add(taxTF);
-		
+
 		JLabel label = new JLabel("%");
 		label.setBounds(512, 363, 20, 22);
 		contentPane.add(label);
+
+		btnAdd = new JButton("Add");
+		btnAdd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				btnAdd.setEnabled(false);
+				addTF();
+			}
+		});
+		btnAdd.setFont(new Font("Calibri", Font.BOLD, 14));
+		btnAdd.setBackground(Color.DARK_GRAY);
+		btnAdd.setForeground(Color.white);
+		btnAdd.setUI(new StyledButtonUI());
+		btnAdd.setBounds(10, 85, 95, 26);
+		contentPane.add(btnAdd);
+
+		grossTF = new JTextField();
+		grossTF.setEditable(false);
+		grossTF.setColumns(10);
+		grossTF.setBounds(437, 427, 136, 26);
+		contentPane.add(grossTF);
+
+		JLabel lblGross = new JLabel("Gross");
+		lblGross.setBounds(383, 433, 46, 14);
+		contentPane.add(lblGross);
+
+		btnInsert = new JButton("Insert");
+		btnInsert.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if ((empNameTF.getText().length() == 0 || (idTF.getText().length() == 0)
+						|| (bpTF.getText().length() == 0) || (allowTF.getText().length() == 0)
+						|| (otTF.getText().length() == 0) || (sssTF.getText().length() == 0)
+						|| (phTF.getText().length() == 0) || (hdmfTF.getText().length() == 0)
+						|| (taxTF.getText().length() == 0))) {
+
+					JOptionPane.showMessageDialog(null, "Please fill up all the requirements", "Warning",
+							JOptionPane.ERROR_MESSAGE);
+				} else {
+					addEmpAcc();
+					JOptionPane.showMessageDialog(null, "Employee Payroll Added.", "Success",
+							JOptionPane.INFORMATION_MESSAGE);
+				}
+
+			}
+		});
+		btnInsert.setFont(new Font("Calibri", Font.BOLD, 14));
+		btnInsert.setBackground(Color.DARK_GRAY);
+		btnInsert.setForeground(Color.white);
+		btnInsert.setUI(new StyledButtonUI());
+		btnInsert.setVisible(false);
+		btnInsert.setBounds(115, 85, 95, 26);
+		contentPane.add(btnInsert);
 
 		display();
 		// contentPane.add(background);
@@ -420,8 +575,15 @@ public class AdminProfileUI extends JFrame {
 
 	public void editButton() {
 		btnEdit.setEnabled(false);
+		btnAdd.setEnabled(false);
 		btnSave.setEnabled(true);
+		btnLogout.setEnabled(false);
+		btnCompute.setEnabled(false);
 		btnCancel.setEnabled(true);
+		btnFirst.setEnabled(false);
+		btnNext.setEnabled(false);
+		btnPrev.setEnabled(false);
+		btnLast.setEnabled(false);
 		// empNameTF.setEditable(true);
 		// idTF.setEditable(true);
 		bpTF.setEditable(true);
@@ -432,15 +594,75 @@ public class AdminProfileUI extends JFrame {
 		hdmfTF.setEditable(true);
 		taxTF.setEditable(true);
 		npTF.setText("");
+		grossTF.setText("");
+
+	}
+
+	public void clearTF() {
+		btnEdit.setEnabled(true);
+		btnSave.setEnabled(false);
+		btnCancel.setEnabled(false);
+		bpTF.setText("");
+		allowTF.setText("");
+		otTF.setText("");
+		sssTF.setText("");
+		phTF.setText("");
+		hdmfTF.setText("");
+		taxTF.setText("");
+		npTF.setText("");
+
+	}
+
+	public void addTF() {
+		btnEdit.setEnabled(false);
+		btnAdd.setEnabled(false);
+		btnSave.setEnabled(false);
+		btnLogout.setEnabled(false);
+		btnCompute.setEnabled(false);
+		btnCancel.setEnabled(true);
+		btnFirst.setEnabled(false);
+		btnNext.setEnabled(false);
+		btnPrev.setEnabled(false);
+		btnLast.setEnabled(false);
+		empNameTF.setEditable(true);
+		idTF.setEditable(true);
+		bpTF.setEditable(true);
+		allowTF.setEditable(true);
+		otTF.setEditable(true);
+		sssTF.setEditable(true);
+		phTF.setEditable(true);
+		hdmfTF.setEditable(true);
+		taxTF.setEditable(true);
+		btnInsert.setVisible(true);
+		npTF.setText("");
+		empNameTF.setText("");
+		idTF.setText("");
+		bpTF.setText("");
+		allowTF.setText("");
+		otTF.setText("");
+		sssTF.setText("");
+		phTF.setText("");
+		hdmfTF.setText("");
+		taxTF.setText("");
+		npTF.setText("");
 
 	}
 
 	public void closeTF() {
+		btnAdd.setEnabled(true);
+		btnInsert.setVisible(false);
 		btnEdit.setEnabled(true);
 		btnSave.setEnabled(false);
+		btnLogout.setEnabled(true);
+		btnCompute.setEnabled(true);
+		btnLogout.setEnabled(true);
+		btnFirst.setEnabled(true);
+		btnNext.setEnabled(true);
+		btnPrev.setEnabled(true);
+		btnLast.setEnabled(true);
 		btnCancel.setEnabled(false);
-		// empNameTF.setEditable(false);
-		// idTF.setEditable(false);
+		empNameTF.setEditable(false);
+		idTF.setEditable(false);
 		bpTF.setEditable(false);
 		allowTF.setEditable(false);
 		otTF.setEditable(false);
@@ -491,6 +713,61 @@ public class AdminProfileUI extends JFrame {
 
 		} catch (SQLException ex) {
 			ex.printStackTrace();
+		}
+	}
+
+	public void addEmpAcc() {
+		String dbURL = "jdbc:db2://localhost:50000/payroll";
+		String username = "Charlie";
+		String password = "1231234";
+		String user = idTF.getText();
+		String pass = idTF.getText();
+		String empname = empNameTF.getText();
+		try (Connection conn = DriverManager.getConnection(dbURL, username, password)) {
+
+			String sql = "INSERT INTO empaccount (username, password, empname) VALUES (?, ?, ?)";
+
+			PreparedStatement statement = conn.prepareStatement(sql);
+			statement.setString(1, user);
+			statement.setString(2, pass);
+			statement.setString(3, empname);
+
+			int rowsInserted = statement.executeUpdate();
+			if (rowsInserted > 0) {
+				JOptionPane.showMessageDialog(null, "Employee account added. The Default username and password is her/his id.",
+						"Success", JOptionPane.INFORMATION_MESSAGE);
+			}
+
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	class StyledButtonUI extends BasicButtonUI {
+
+		@Override
+		public void installUI(JComponent c) {
+			super.installUI(c);
+			AbstractButton button = (AbstractButton) c;
+			button.setOpaque(false);
+			button.setBorder(new EmptyBorder(5, 15, 5, 15));
+		}
+
+		@Override
+		public void paint(Graphics g, JComponent c) {
+			AbstractButton b = (AbstractButton) c;
+			paintBackground(g, b, b.getModel().isPressed() ? 2 : 0);
+			super.paint(g, c);
+		}
+
+		private void paintBackground(Graphics g, JComponent c, int yOffset) {
+			Dimension size = c.getSize();
+			Graphics2D g2 = (Graphics2D) g;
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setColor(c.getBackground().darker());
+			g.fillRoundRect(0, yOffset, size.width, size.height - yOffset, 10, 10);
+			g.setColor(c.getBackground());
+			g.fillRoundRect(0, yOffset, size.width, size.height + yOffset - 5, 10, 10);
 		}
 	}
 }

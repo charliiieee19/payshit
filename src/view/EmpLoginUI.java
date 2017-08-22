@@ -1,38 +1,39 @@
 package view;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.basic.BasicButtonUI;
-
-
-import view.AdminLoginUI.StyledButtonUI;
-
-import javax.swing.JTextField;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
 import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-
-import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.awt.event.ActionEvent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.basic.BasicButtonUI;
 
 public class EmpLoginUI extends JFrame {
 
 	private JPanel contentPane;
 	private JLabel background;
-	private JTextField userTF;
+	static JTextField userTF;
 	private JPasswordField passTF;
 
 	public EmpLoginUI() {
@@ -78,28 +79,8 @@ public class EmpLoginUI extends JFrame {
 		JButton btnLogin = new JButton("Login");
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String dbURL = "jdbc:db2://localhost:50000/payroll";
-				String username = "Charlie";
-				String password = "1231234";
+				Login();
 
-				try (Connection conn = DriverManager.getConnection(dbURL, username, password)) {
-
-					String sql = "select * from empaccount where username=? and password=?";
-
-					PreparedStatement statement = conn.prepareStatement(sql);
-					statement.setString(1, userTF.getText());
-					statement.setString(2, passTF.getText());
-					ResultSet rs = statement.executeQuery();
-
-					if (rs.next()) {
-						new EmpProfileUI();
-						dispose();
-					} else {
-						JOptionPane.showMessageDialog(null, "Invalid username or password");
-					}
-				} catch (Exception e1) {
-					JOptionPane.showMessageDialog(null, e1);
-				}
 			}
 		});
 
@@ -127,7 +108,15 @@ public class EmpLoginUI extends JFrame {
 		JButton btnExit = new JButton("Exit");
 		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dispose();
+				int dialogButton = JOptionPane.showConfirmDialog(null, "Are you sure to exit?", "Warning",
+						JOptionPane.YES_NO_OPTION);
+
+				if (dialogButton == JOptionPane.YES_OPTION) {
+
+					dispose();
+				} else {
+					disableEvents(dialogButton);
+				}
 			}
 		});
 		btnExit.setFont(new Font("Calibri", Font.BOLD, 14));
@@ -140,7 +129,7 @@ public class EmpLoginUI extends JFrame {
 		JLabel lblForgotPassword = new JLabel("Forgot Password?");
 		lblForgotPassword.setBounds(30, 197, 111, 23);
 		lblForgotPassword.setForeground(Color.WHITE);
-		lblForgotPassword.setToolTipText("Contact idiot 09187654321");
+		lblForgotPassword.setToolTipText("Contact Admin 09187654321");
 		contentPane.add(lblForgotPassword);
 		contentPane.add(background);
 		setVisible(true);
@@ -190,4 +179,36 @@ public class EmpLoginUI extends JFrame {
 		}
 	}
 
+	public void Login() {
+		String strDriver = "com.ibm.db2.jcc.DB2Driver";
+		Connection conn;
+		Statement stmt;
+		ResultSet rs;
+		String strUrl = "jdbc:db2://localhost:50000/payroll";
+		String user = "Charlie";
+		String pass = "1231234";
+		String usern = userTF.getText();
+		String passw = passTF.getText();
+
+		try {
+			Class.forName(strDriver);
+			conn = DriverManager.getConnection(strUrl, user, pass);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("Select username,password from empaccount where username='" + usern
+					+ "' and password='" + passw + "'");
+
+			if (rs.next()) {
+
+				dispose();
+				new EmpProfileUI();
+				JOptionPane.showMessageDialog(null, "Welcome Employee!");
+			} else {
+				JOptionPane.showMessageDialog(null, "Invalid Username or Password!");
+			}
+			rs.close();
+			conn.close();
+		} catch (Exception e) {
+			System.out.print(e.toString());
+		}
+	}
 }
