@@ -39,7 +39,7 @@ public class EmpLoginUI extends JFrame {
 	public EmpLoginUI() {
 		setTitle("Payroll System");
 		setIconImage(Toolkit.getDefaultToolkit()
-				.getImage("C:\\Users\\Charlie\\eclipse-workspace\\PayIdiot\\src\\Images\\one.jpg"));
+				.getImage("C:\\Users\\Charlie\\eclipse-workspace\\PayIdiot\\src\\Images\\dollar.png"));
 		background = new JLabel();
 		background.setIcon(new ImageIcon("C:\\Users\\Charlie\\eclipse-workspace\\PayIdiot\\src\\Images\\one.jpg"));
 		background.setBounds(0, 0, 564, 310);
@@ -194,16 +194,18 @@ public class EmpLoginUI extends JFrame {
 			Class.forName(strDriver);
 			conn = DriverManager.getConnection(strUrl, user, pass);
 			stmt = conn.createStatement();
-			rs = stmt.executeQuery("Select username,password from empaccount where username='" + usern
+			rs = stmt.executeQuery("Select username, password from empaccount where username='" + usern
 					+ "' and password='" + passw + "'");
 
 			if (rs.next()) {
 
 				dispose();
 				new EmpProfileUI();
-				JOptionPane.showMessageDialog(null, "Welcome Employee!");
+				JOptionPane.showMessageDialog(null, "Welcome Employee :P");
 			} else {
 				JOptionPane.showMessageDialog(null, "Invalid Username or Password!");
+				userTF.setText("");
+				passTF.setText("");
 			}
 			rs.close();
 			conn.close();

@@ -41,7 +41,7 @@ public class EmpProfileUI extends JFrame {
 	public EmpProfileUI() throws ClassNotFoundException, SQLException {
 		setTitle("Edit Employee");
 		setIconImage(Toolkit.getDefaultToolkit()
-				.getImage("C:\\Users\\Charlie\\eclipse-workspace\\PayIdiot\\src\\Images\\one.jpg"));
+				.getImage("C:\\Users\\Charlie\\eclipse-workspace\\PayIdiot\\src\\Images\\dollar.png"));
 		background = new JLabel();
 		background
 				.setIcon(new ImageIcon("C:\\Users\\Charlie\\eclipse-workspace\\PayIdiot\\src\\Images\\empprofile.jpg"));

@@ -39,7 +39,7 @@ public class AdminProfileUI extends JFrame {
 	private JTextField idTF;
 	private JLabel background;
 	private JButton btnSave, btnCancel, btnEdit, btnAdd, btnFirst, btnNext, btnPrev, btnLast, btnInsert, btnLogout,
-			btnCompute;
+			btnGetEmp, btnCompute;
 	private Connection con;
 	private Statement st;
 	private ResultSet rs;
@@ -308,25 +308,25 @@ public class AdminProfileUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				npTF.setText("");
 				grossTF.setText("");
-
-				try {
-
-					if (rs.last()) {
-
-						empNameTF.setText(rs.getString("empname"));
-						idTF.setText(rs.getString("id"));
-						bpTF.setText(rs.getString("basicpay"));
-						allowTF.setText(rs.getString("allowance"));
-						otTF.setText(rs.getString("overtime"));
-						sssTF.setText(rs.getString("sss"));
-						phTF.setText(rs.getString("phealth"));
-						hdmfTF.setText(rs.getString("hdmf"));
-						taxTF.setText(rs.getString("tax"));
-
-					}
-				} catch (Exception ex) {
-
-				}
+				Last();
+				// try {
+				//
+				// if (rs.last()) {
+				//
+				// empNameTF.setText(rs.getString("empname"));
+				// idTF.setText(rs.getString("id"));
+				// bpTF.setText(rs.getString("basicpay"));
+				// allowTF.setText(rs.getString("allowance"));
+				// otTF.setText(rs.getString("overtime"));
+				// sssTF.setText(rs.getString("sss"));
+				// phTF.setText(rs.getString("phealth"));
+				// hdmfTF.setText(rs.getString("hdmf"));
+				// taxTF.setText(rs.getString("tax"));
+				//
+				// }
+				// } catch (Exception ex) {
+				//
+				// }
 			}
 		});
 		btnLast.setFont(new Font("Calibri", Font.BOLD, 14));
@@ -336,7 +336,7 @@ public class AdminProfileUI extends JFrame {
 		btnLast.setBounds(336, 48, 112, 26);
 		contentPane.add(btnLast);
 
-		JButton btnGetEmp = new JButton("Get All Employee List");
+		btnGetEmp = new JButton("Get All Employee List");
 		btnGetEmp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new EmpListUI();
@@ -358,10 +358,11 @@ public class AdminProfileUI extends JFrame {
 
 			}
 		});
+
 		bpTF.setBounds(203, 262, 136, 26);
 		bpTF.setEditable(false);
-		contentPane.add(bpTF);
 		bpTF.setColumns(10);
+		contentPane.add(bpTF);
 
 		JLabel lblBasicPay = new JLabel("Basic Pay:");
 		lblBasicPay.setBounds(134, 267, 65, 16);
@@ -538,18 +539,25 @@ public class AdminProfileUI extends JFrame {
 		btnInsert = new JButton("Insert");
 		btnInsert.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if ((empNameTF.getText().length() == 0 || (idTF.getText().length() == 0)
-						|| (bpTF.getText().length() == 0) || (allowTF.getText().length() == 0)
-						|| (otTF.getText().length() == 0) || (sssTF.getText().length() == 0)
-						|| (phTF.getText().length() == 0) || (hdmfTF.getText().length() == 0)
-						|| (taxTF.getText().length() == 0))) {
+				if ((empNameTF.getText().length() == 0 || (bpTF.getText().length() == 0)
+						|| (allowTF.getText().length() == 0) || (otTF.getText().length() == 0)
+						|| (sssTF.getText().length() == 0) || (phTF.getText().length() == 0)
+						|| (hdmfTF.getText().length() == 0) || (taxTF.getText().length() == 0))) {
 
 					JOptionPane.showMessageDialog(null, "Please fill up all the requirements", "Warning",
 							JOptionPane.ERROR_MESSAGE);
 				} else {
 					addEmpAcc();
-					JOptionPane.showMessageDialog(null, "Employee Payroll Added.", "Success",
-							JOptionPane.INFORMATION_MESSAGE);
+					addPayroll();
+					closeTF();
+					try {
+						display();
+					} catch (ClassNotFoundException | SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					Last();
+
 				}
 
 			}
@@ -577,6 +585,7 @@ public class AdminProfileUI extends JFrame {
 		btnEdit.setEnabled(false);
 		btnAdd.setEnabled(false);
 		btnSave.setEnabled(true);
+		btnGetEmp.setEnabled(false);
 		btnLogout.setEnabled(false);
 		btnCompute.setEnabled(false);
 		btnCancel.setEnabled(true);
@@ -614,10 +623,15 @@ public class AdminProfileUI extends JFrame {
 	}
 
 	public void addTF() {
+		Last();
+		int lastid = Integer.parseInt(idTF.getText());
+		int idgen = lastid + 1;
+
 		btnEdit.setEnabled(false);
 		btnAdd.setEnabled(false);
 		btnSave.setEnabled(false);
 		btnLogout.setEnabled(false);
+		btnGetEmp.setEnabled(false);
 		btnCompute.setEnabled(false);
 		btnCancel.setEnabled(true);
 		btnFirst.setEnabled(false);
@@ -625,7 +639,6 @@ public class AdminProfileUI extends JFrame {
 		btnPrev.setEnabled(false);
 		btnLast.setEnabled(false);
 		empNameTF.setEditable(true);
-		idTF.setEditable(true);
 		bpTF.setEditable(true);
 		allowTF.setEditable(true);
 		otTF.setEditable(true);
@@ -636,7 +649,7 @@ public class AdminProfileUI extends JFrame {
 		btnInsert.setVisible(true);
 		npTF.setText("");
 		empNameTF.setText("");
-		idTF.setText("");
+		idTF.setText(String.valueOf(idgen));
 		bpTF.setText("");
 		allowTF.setText("");
 		otTF.setText("");
@@ -653,6 +666,7 @@ public class AdminProfileUI extends JFrame {
 		btnInsert.setVisible(false);
 		btnEdit.setEnabled(true);
 		btnSave.setEnabled(false);
+		btnGetEmp.setEnabled(true);
 		btnLogout.setEnabled(true);
 		btnCompute.setEnabled(true);
 		btnLogout.setEnabled(true);
@@ -693,7 +707,7 @@ public class AdminProfileUI extends JFrame {
 		con = DriverManager.getConnection("jdbc:db2://localhost:50000/payroll", "Charlie", "1231234");
 		st = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
-		String sql = "select * from employees order by empname";
+		String sql = "select * from employees order by id";
 		rs = st.executeQuery(sql);
 
 		try {
@@ -709,6 +723,47 @@ public class AdminProfileUI extends JFrame {
 				phTF.setText(rs.getString("phealth"));
 				hdmfTF.setText(rs.getString("hdmf"));
 				taxTF.setText(rs.getString("tax"));
+			}
+
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	public void addPayroll() {
+		String dbURL = "jdbc:db2://localhost:50000/payroll";
+		String username = "Charlie";
+		String password = "1231234";
+
+		String emp = empNameTF.getText();
+		String id = idTF.getText();
+		int bp = Integer.parseInt(bpTF.getText());
+
+		int allow = Integer.parseInt(allowTF.getText());
+		int ot = Integer.parseInt(otTF.getText());
+		int sss = Integer.parseInt(sssTF.getText());
+		int ph = Integer.parseInt(phTF.getText());
+		int hdmf = Integer.parseInt(hdmfTF.getText());
+		int tax = Integer.parseInt(taxTF.getText());
+		try (Connection conn = DriverManager.getConnection(dbURL, username, password)) {
+
+			String sql = "INSERT INTO employees (empname, id, basicpay, allowance, overtime, sss, phealth, hdmf, tax) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+			PreparedStatement statement = conn.prepareStatement(sql);
+			statement.setString(1, emp);
+			statement.setString(2, id);
+			statement.setInt(3, bp);
+			statement.setInt(4, allow);
+			statement.setInt(5, ot);
+			statement.setInt(6, sss);
+			statement.setInt(7, ph);
+			statement.setInt(8, hdmf);
+			statement.setInt(9, tax);
+
+			int rowsInserted = statement.executeUpdate();
+			if (rowsInserted > 0) {
+				JOptionPane.showMessageDialog(null, "Employee Payroll added.", "Success",
+						JOptionPane.INFORMATION_MESSAGE);
 			}
 
 		} catch (SQLException ex) {
@@ -734,8 +789,9 @@ public class AdminProfileUI extends JFrame {
 
 			int rowsInserted = statement.executeUpdate();
 			if (rowsInserted > 0) {
-				JOptionPane.showMessageDialog(null, "Employee account added. The Default username and password is her/his id.",
-						"Success", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(null,
+						"Employee account added. The Default username and password is her/his id.", "Success",
+						JOptionPane.INFORMATION_MESSAGE);
 			}
 
 		} catch (SQLException ex) {
@@ -768,6 +824,27 @@ public class AdminProfileUI extends JFrame {
 			g.fillRoundRect(0, yOffset, size.width, size.height - yOffset, 10, 10);
 			g.setColor(c.getBackground());
 			g.fillRoundRect(0, yOffset, size.width, size.height + yOffset - 5, 10, 10);
+		}
+	}
+
+	public void Last() {
+		try {
+
+			if (rs.last()) {
+
+				empNameTF.setText(rs.getString("empname"));
+				idTF.setText(rs.getString("id"));
+				bpTF.setText(rs.getString("basicpay"));
+				allowTF.setText(rs.getString("allowance"));
+				otTF.setText(rs.getString("overtime"));
+				sssTF.setText(rs.getString("sss"));
+				phTF.setText(rs.getString("phealth"));
+				hdmfTF.setText(rs.getString("hdmf"));
+				taxTF.setText(rs.getString("tax"));
+
+			}
+		} catch (Exception ex) {
+
 		}
 	}
 }

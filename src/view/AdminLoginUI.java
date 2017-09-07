@@ -35,11 +35,11 @@ public class AdminLoginUI extends JFrame {
 	private JLabel background;
 	private JTextField userTF;
 	private JPasswordField passTF;
-	
+
 	public AdminLoginUI() {
 		setTitle("Payroll System");
 		setIconImage(Toolkit.getDefaultToolkit()
-				.getImage("C:\\Users\\Charlie\\eclipse-workspace\\PayIdiot\\src\\Images\\one.jpg"));
+				.getImage("C:\\Users\\Charlie\\eclipse-workspace\\PayIdiot\\src\\Images\\dollar.png"));
 		background = new JLabel();
 		background.setIcon(new ImageIcon("C:\\Users\\Charlie\\eclipse-workspace\\PayIdiot\\src\\Images\\admin.jpg"));
 		background.setBounds(0, 0, 580, 349);
@@ -78,7 +78,7 @@ public class AdminLoginUI extends JFrame {
 		JButton btnLogin = new JButton("Login");
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				login();
+				Login();
 			}
 		});
 		btnLogin.setFont(new Font("Calibri", Font.BOLD, 14));
@@ -172,8 +172,7 @@ public class AdminLoginUI extends JFrame {
 		}
 	}
 
-	
-	public void login() {
+	public void Login() {
 		String strDriver = "com.ibm.db2.jcc.DB2Driver";
 		Connection conn;
 		Statement stmt;
@@ -188,8 +187,8 @@ public class AdminLoginUI extends JFrame {
 			Class.forName(strDriver);
 			conn = DriverManager.getConnection(strUrl, user, pass);
 			stmt = conn.createStatement();
-			rs = stmt.executeQuery("Select username,password from admin where username='" + usern
-					+ "' and password='" + passw + "'");
+			rs = stmt.executeQuery(
+					"Select username,password from admin where username='" + usern + "' and password='" + passw + "'");
 
 			if (rs.next()) {
 
@@ -198,6 +197,8 @@ public class AdminLoginUI extends JFrame {
 				JOptionPane.showMessageDialog(null, "Welcome " + rs.getString("username"));
 			} else {
 				JOptionPane.showMessageDialog(null, "Invalid Username or Password!");
+				userTF.setText("");
+				passTF.setText("");
 			}
 			rs.close();
 			conn.close();
